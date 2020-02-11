@@ -7,18 +7,8 @@ const path=require('path')
 require('./db/mongoose')
 
 const port = process.env.PORT
-const hbs=require('hbs')
 const app = express()
 
-const pathtohtmlfile=path.join(__dirname,'../public')
-const viewpath=path.join(__dirname,'../templates/views')
-app.set('view engine','hbs')
-app.set('views',viewpath)
-
-app.use(express.static(pathtohtmlfile))
-app.get('',(req,res)=>{
-    res.render('signup')
-})
 // app.use((req,res,next)=>{
 //     if(req.method==='GET'){
 //         res.send('GET request is disabled')
