@@ -26,92 +26,61 @@ router.post('/tasks', auth, async (req, res) => {
 
 })
 
-router.get('/tasks', auth, async (req, res) => {
-    try {
-        const match = {}
 
-        if(req.query.completed){
-            match.completed=req.query.completed==='true'
-            
-        }
-        const sort={}
-        if(req.query.sortBy){
-            const parts=req.query.sortBy.split(':')
-            sort[parts[0]]=parts[1]==='desc'?-1:1
-        }
-       
+// router.get('/tasks/:id', auth, async (req, res) => {
+//     try {
+//         const task = await Tasks.findOne({ _id: req.params.id, owner: req.user.id })
+//         if (!task) {
+//             return res.status(404).send('404 Error!')
+//         }
+//         res.send(task)
 
-        //const tasks = await Tasks.find({owner:req.user.id})
-        await req.user.populate({
-            path: 'task',
-            match,
-            options:{
-                limit:parseInt(req.query.limit),
-                skip:parseInt(req.query.skip),
-                sort
-            }
+//     } catch (e) {
+//         res.status(500).send(e)
 
-        }).execPopulate()
-        res.send(req.user.task)
+//     }
 
-    } catch (e) {
-        res.status(500).send(e)
-    }
-})
-router.get('/tasks/:id', auth, async (req, res) => {
-    try {
-        const task = await Tasks.findOne({ _id: req.params.id, owner: req.user.id })
-        if (!task) {
-            return res.status(404).send('404 Error!')
-        }
-        res.send(task)
+// })
+// router.patch('/tasks/:id', auth, async (req, res) => {
+//     const updates = Object.keys(req.body)
+//     const allowedupdates = ['description', 'completed']
+//     const isvalidoperation =
+//         updates.every((update) => {
+//             return allowedupdates.includes(update)
+//         })
+//     if (!isvalidoperation) {
+//         return res.status(400).send('inavlid operation!!')
 
-    } catch (e) {
-        res.status(500).send(e)
+//     }
+//     try {
+//         const task = await Tasks.findOne({ _id: req.params.id, owner: req.user.id })
+//         if (!task) {
+//             res.status(404).send()
+//         }
 
-    }
+//         updates.forEach((update) => {
+//             task[update] = req.body[update]
+//         })
+//         task.save()
+//         // const task = await Tasks.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
 
-})
-router.patch('/tasks/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body)
-    const allowedupdates = ['description', 'completed']
-    const isvalidoperation =
-        updates.every((update) => {
-            return allowedupdates.includes(update)
-        })
-    if (!isvalidoperation) {
-        return res.status(400).send('inavlid operation!!')
+//         res.send(task)
+//     } catch (e) {
+//         res.status(500).send(e)
 
-    }
-    try {
-        const task = await Tasks.findOne({ _id: req.params.id, owner: req.user.id })
-        if (!task) {
-            res.status(404).send()
-        }
+//     }
+// })
 
-        updates.forEach((update) => {
-            task[update] = req.body[update]
-        })
-        task.save()
-        // const task = await Tasks.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+// router.delete('/tasks/:id', auth, async (req, res) => {
+//     try {
+//         const task = await Tasks.findOneAndDelete({ _id: req.params.id, owner: req.user.id })
+//         if (!task) {
+//             res.status(404).send('task not found')
+//         }
+//         res.send(task)
 
-        res.send(task)
-    } catch (e) {
-        res.status(500).send(e)
-
-    }
-})
-
-router.delete('/tasks/:id', auth, async (req, res) => {
-    try {
-        const task = await Tasks.findOneAndDelete({ _id: req.params.id, owner: req.user.id })
-        if (!task) {
-            res.status(404).send('task not found')
-        }
-        res.send(task)
-
-    } catch (e) {
-        res.status(500).send(e)
-    }
-})
+//     } catch (e) {
+//         res.status(500).send(e)
+//     }
+// })
 module.exports = router

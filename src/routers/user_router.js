@@ -193,4 +193,10 @@ router.delete('/user/me', auth, async (req, res) => {
     }
 })
 
+router.get('alluser', (req,res) => {
+    User.find()
+    .then(user => res.json(user))
+    .catch(err => res.status(400).json('Error' + err)); 
+})
+
 module.exports = router
