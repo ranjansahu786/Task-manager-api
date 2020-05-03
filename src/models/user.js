@@ -54,6 +54,16 @@ const userSchema = new mongoose.Schema({
             require:true
         }
     }],
+
+    phone: {
+        type: Number,
+        required: true
+    },
+    ttime: {
+        type: Number,
+
+    },
+
     avatar:{
         type:Buffer
     }
