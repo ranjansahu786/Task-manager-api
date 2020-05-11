@@ -3,6 +3,7 @@ const bcryptjs=require('bcryptjs')
 //const validator=require('validator')
 const userSchema=new mongoose.Schema({
     
+
     completed:{
         type:Boolean,
         default:false

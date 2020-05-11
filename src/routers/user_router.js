@@ -13,14 +13,16 @@ const uploads = multer({
     limits: {
         fileSize: 100000000
     }, fileFilter(req, file, cb) {
-        if (!file.originalname.match(/\.(png|jpeg|jpg|doc|docx)$/)) {
+        if (!file.originalname.match(/\.(png|jpeg|jpg|doc|docx|pdf)$/)) {
             return cb(new Error('please upload file'))
         }
         cb(undefined, true)
     }
 
+
 })
 
+//  -------------  Creating User  ------------
 
 router.post('/users', async (req, res) => {
     try {
@@ -42,6 +44,8 @@ router.post('/users', async (req, res) => {
     //     res.send(e)
     // })
 })
+
+// ----------- Login using User Credentials ------------ 
 router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
@@ -55,9 +59,11 @@ router.post('/users/login', async (req, res) => {
 })
 
 
-router.post('/users/me/avatar', auth, uploads.single('avatar'), async (req, res) => {
-    const buffer= await sharp(req.file.buffer).resize({width:250, height:250}).png().toBuffer()
-    req.user.avatar=buffer
+// ---------------- Upload Profile -------------
+
+router.post('/users/upload/avatar', auth, uploads.single('avatar'), async (req, res) => {
+    //const buffer= await sharp(req.file.buffer).resize({width:250, height:250}).png().toBuffer()
+    req.user.avatar=req.file.buffer
     await req.user.save()
     res.send()
 }, (error, req, res, next) => {
@@ -65,7 +71,22 @@ router.post('/users/me/avatar', auth, uploads.single('avatar'), async (req, res)
 })
 
 
-router.delete('/users/me/avatar', auth, uploads.single('avatar'), async (req, res) => {
+// ------------------ Upload Documents -------------------
+
+router.post('/users/upload/documents', auth, uploads.single('documents'), async (req, res) => {
+    //const buffer= await sharp(req.file.buffer).resize({width:250, height:250}).png().toBuffer()
+    req.user.documents=req.file.buffer
+    await req.user.save()
+    res.send()
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message })
+})
+
+
+
+// ------------------ Delete Profile ----------------
+
+router.delete('/users/me/avatar', auth, uploads.any(), async (req, res) => {
 
     req.user.avatar = undefined
     await req.user.save()
@@ -75,19 +96,42 @@ router.delete('/users/me/avatar', auth, uploads.single('avatar'), async (req, re
 })
 
 
+
+// ------------------ Getting Profile --------------
+
 router.get('/users/:id/avatar', async (req, res) => {
     try {
         const user = await User.findById(req.params.id)
         if (!user || !user.avatar) {
             throw new Error('user not found!!!')
         }
-        res.set('Content-Type', 'image/jpeg')
+        res.set('Content-Type', 'image/jpeg' )
+        //res.set('Content-Type', 'application/pdf')
         res.send(user.avatar)
     } catch (e) {
         res.status(404).send()
     }
 })
 
+
+// ------------------- Getting Documents ----------------
+
+router.get('/users/:id/documents', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+        if (!user || !user.documents) {
+            throw new Error('user not found!!!')
+        }
+        res.set('Content-Type', 'application/pdf' )
+        //res.set('Content-Type', 'application/pdf')
+        res.send(user.documents)
+    } catch (e) {
+        res.status(404).send()
+    }
+})
+
+
+// ----------------- Logging out from Authenticate ---------------
 
 router.post('/user/logout', auth, async (req, res) => {
     try {
@@ -114,6 +158,8 @@ router.post('/user/logoutAll', auth, async (req, res) => {
 })
 
 
+// ----------------- Getting User details ----------------
+
 router.get('/user/me', auth, async (req, res) => {
     try {
         res.send(req.user)
@@ -130,6 +176,7 @@ router.get('/user/me', auth, async (req, res) => {
     // })
 })
 
+// ------------------ Getting user Details by Id --------------------
 
 router.get('/users/:id', auth, async (req, res) => {
 
@@ -158,9 +205,11 @@ router.get('/users/:id', auth, async (req, res) => {
 })
 
 
+// -------------------- Updating User ---------------------
+
 router.patch('/user/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedupdates = ['name', 'email', 'age', 'password']
+    const allowedupdates = ['name', 'email', 'age', 'password', 'phone']
     const isvalidoperation = updates.every((update) => {
         return allowedupdates.includes(update)
     })
@@ -181,6 +230,7 @@ router.patch('/user/me', auth, async (req, res) => {
 })
 
 
+// ----------------------- Delete User --------------------
 
 router.delete('/user/me', auth, async (req, res) => {
     try {

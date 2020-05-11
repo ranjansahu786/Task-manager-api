@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs')
 const jwt=require('jsonwebtoken')
 const Tasks=require('../models/task')
 
+// -------------------model to create user -----------------
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -37,7 +38,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        require: true,
+        required: true,
         trim: true,
         validate(value) {
             if (value.includes("password")) {
@@ -47,6 +48,11 @@ const userSchema = new mongoose.Schema({
         },
         minlength: 6
     },
+    phone:{
+        type:Number,
+        required:true,
+        minlength:10
+    },
 
     tokens:[{
         token:{
@@ -55,6 +61,9 @@ const userSchema = new mongoose.Schema({
         }
     }],
     avatar:{
+        type:Buffer
+    },
+    documents:{
         type:Buffer
     }
     
@@ -100,7 +109,8 @@ userSchema.methods.generateAuthToken = async function(){
     return token
     
 }
-// hash the password before saving the password
+// --------------- hash the password before saving the password ---------------
+
 userSchema.pre('save', async function (next) {
     const user = this
     if (user.isModified('password')) {
