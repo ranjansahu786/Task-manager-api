@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
         trim: true
 
     },
+
     age: {
         type: Number,
         default: 0,
@@ -24,6 +25,8 @@ const userSchema = new mongoose.Schema({
         }
 
     },
+
+
     email: {
         type: String,
         required: true,
@@ -36,6 +39,8 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
+
+
     password: {
         type: String,
         required: true,
@@ -48,11 +53,39 @@ const userSchema = new mongoose.Schema({
         },
         minlength: 6
     },
+
+
     phone:{
         type:Number,
         required:true,
+        default:91,
         minlength:10
     },
+
+
+    levels:{
+        type:Number,
+        default:0
+    },
+
+
+    minutes:{
+     type:Number,
+     default:0
+    },
+
+
+    profession: {
+        type:String,
+        default:""
+    },
+
+
+    ttime:{
+        type:String,
+        default:new Date().getHours() + " : "+ new Date().getMinutes()+" : "+new Date().getSeconds()
+    },
+
 
     tokens:[{
         token:{
@@ -60,16 +93,23 @@ const userSchema = new mongoose.Schema({
             require:true
         }
     }],
+
+
     avatar:{
         type:Buffer
     },
+
+
     documents:{
         type:Buffer
-    }
+    },
+
+
     
 },{
     timestamps:true
-})
+},
+)
 userSchema.virtual('task',{
 ref:'Tasks',
 localField:'_id',

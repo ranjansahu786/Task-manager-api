@@ -4,13 +4,14 @@ const bcryptjs=require('bcryptjs')
 const userSchema=new mongoose.Schema({
     
 
-    completed:{
-        type:Boolean,
-        default:false
+    friends:{
+        type:String,
+        default:""
     },
-    description:{
+    chats:{
         required:true,
         trim:true,
+        default:"",
         type:String
 
     },

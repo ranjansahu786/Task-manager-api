@@ -209,7 +209,7 @@ router.get('/users/:id', auth, async (req, res) => {
 
 router.patch('/user/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedupdates = ['name', 'email', 'age', 'password', 'phone']
+    const allowedupdates = ['name', 'email', 'age', 'password', 'phone', 'minutes']
     const isvalidoperation = updates.every((update) => {
         return allowedupdates.includes(update)
     })
@@ -219,6 +219,7 @@ router.patch('/user/me', auth, async (req, res) => {
     try {
         updates.forEach((update) => {
             req.user[update] = req.body[update]
+            req.user.ttime = new Date().getHours() + " : "+ new Date().getMinutes()+" : "+new Date().getSeconds()
         })
         await req.user.save()
         // const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
