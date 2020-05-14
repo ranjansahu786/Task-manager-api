@@ -83,18 +83,31 @@ router.post('/users/upload/documents', auth, uploads.single('documents'), async 
 })
 
 
+// ----------------- Logging out from Authenticate ---------------
 
-// ------------------ Delete Profile ----------------
+router.post('/user/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token
+        })
+        await req.user.save()
+        res.send()
+    } catch (e) {
+        res.status(500).send()
 
-router.delete('/users/me/avatar', auth, uploads.any(), async (req, res) => {
-
-    req.user.avatar = undefined
-    await req.user.save()
-    res.send()
-}, (error, req, res, next) => {
-    res.status(400).send({ error: error.message })
+    }
 })
 
+//------------- logout all ---------------
+router.post('/user/logoutAll', auth, async (req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 
 
 // ------------------ Getting Profile --------------
@@ -131,32 +144,6 @@ router.get('/users/:id/documents', async (req, res) => {
 })
 
 
-// ----------------- Logging out from Authenticate ---------------
-
-router.post('/user/logout', auth, async (req, res) => {
-    try {
-        req.user.tokens = req.user.tokens.filter((token) => {
-            return token.token !== req.token
-        })
-        await req.user.save()
-        res.send()
-    } catch (e) {
-        res.status(500).send()
-
-    }
-})
-
-
-router.post('/user/logoutAll', auth, async (req, res) => {
-    try {
-        req.user.tokens = []
-        await req.user.save()
-        res.send()
-    } catch (e) {
-        res.status(500).send()
-    }
-})
-
 
 // ----------------- Getting User details ----------------
 
@@ -176,13 +163,35 @@ router.get('/user/me', auth, async (req, res) => {
     // })
 })
 
+
+router.get('/users/:name', async (req, res) => {
+    const name = req.params.name
+    try {
+        const user = await User.findOne({'name':name} )
+        res.send(user)
+        console.log(user)
+    } catch (e) {
+        res.status(400).send()
+    }
+})
+
+
+router.get('/allusers', async(req, res) => {
+        try{
+            const usersall = await User.find({ })
+            res.send(usersall)
+        }catch (e){
+            res.status(500).send()
+        }
+})
+
 // ------------------ Getting user Details by Id --------------------
 
-router.get('/users/:id', auth, async (req, res) => {
+router.get('/user/:id', auth, async (req, res) => {
 
     const _id = req.user.id
     try {
-        const user = await User.findById(_id)
+        const user = await User.findById({_id})
         if (!user) {
             return res.status(404).send()
         }
@@ -209,7 +218,7 @@ router.get('/users/:id', auth, async (req, res) => {
 
 router.patch('/user/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedupdates = ['name', 'email', 'age', 'password', 'phone', 'minutes', 'profession']
+    const allowedupdates = ['name', 'email', 'age', 'password', 'phone', 'minutes', 'profession', 'levels']
     const isvalidoperation = updates.every((update) => {
         return allowedupdates.includes(update)
     })
@@ -229,6 +238,22 @@ router.patch('/user/me', auth, async (req, res) => {
         res.status(500).send(e)
     }
 })
+
+
+
+
+// ------------------ Delete Profile ----------------
+
+router.delete('/users/me/avatar', auth, uploads.any(), async (req, res) => {
+
+    req.user.avatar = undefined
+    await req.user.save()
+    res.send()
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message })
+})
+
+
 
 
 // ----------------------- Delete User --------------------
