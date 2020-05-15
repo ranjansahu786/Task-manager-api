@@ -168,10 +168,12 @@ router.get('/users/:name', async (req, res) => {
     const name = req.params.name
     try {
         const user = await User.findOne({'name':name} )
+        if(!user){
+            throw Error('No user found')
+        }
         res.send(user)
-        console.log(user)
     } catch (e) {
-        res.status(400).send()
+        res.status(400).send('404! No User found!!!!!')
     }
 })
 
