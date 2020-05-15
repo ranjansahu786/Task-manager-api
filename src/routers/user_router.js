@@ -169,11 +169,11 @@ router.get('/users/:name', async (req, res) => {
     try {
         const user = await User.findOne({'name':name} )
         if(!user){
-            throw Error('No user found')
+            return res.status(404).send('404! Not Found')
         }
         res.send(user)
     } catch (e) {
-        res.status(400).send('404! No User found!!!!!')
+        res.status(500).send(e)
     }
 })
 
@@ -181,9 +181,12 @@ router.get('/users/:name', async (req, res) => {
 router.get('/allusers', async(req, res) => {
         try{
             const usersall = await User.find({ })
+            if(!usersall){
+                return res.status(404).send('404! Not Found')
+            }
             res.send(usersall)
         }catch (e){
-            res.status(500).send()
+            res.status(500).send(e)
         }
 })
 
